@@ -1,0 +1,20 @@
+export enum ErrorMessages {
+  INVALID_CREDENTIALS = 'Invalid credentials',
+  UNAUTHENTICATED = 'Unauthenticated',
+  UNAUTHORIZED = 'Unauthorized access',
+  NOT_FOUND = 'Record not found',
+  NOT_ALLOWED = 'You are not permitted to perform this action',
+  TOKEN_REQUIRED = 'Token is required',
+  TOKEN_EXPIRED = 'Invalid or expired session',
+  DUPLICATE = 'Record already exists',
+  EXISTING_CREDENTIAL = 'A user with the credentials already exist',
+  VALIDATION_ERROR = 'Invalid input',
+  SERVICE_UNAVAILABLE = 'Service currently unavailable',
+  INTERNAL_ERROR = 'Internal server error',
+
+  INVALID_CODE = 'Invalid or expired code provided',
+  VALID_CODE = 'The requested OTP is still valid',
+  LIMITED_ACCESS = 'Limited access',
+  NEEDS_ACTIVATION = 'Activate your account',
+  TOO_MANY_REQUESTS = 'Too many requests',
+}
