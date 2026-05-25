@@ -5,16 +5,18 @@ import { MovieRepository } from 'src/database/repositories/movie.repository';
 import { DatabaseModule } from 'src/database/database.module';
 import { UserModule } from '../user/user.module';
 import { UserMovieController } from './controllers/userMovie/userMovie.controller';
-import { MovieTransactionController } from './controllers/movie-transaction/movie-transaction.controller';
-import { MovieTransactionService } from './services/movie-transaction/movie-transaction.service';
+import { WalletModule } from '../wallet/wallet.module';
+import { MovieTransactionManagementService } from './services/movie-transaction/movie-transaction-management.service';
+import { MovieTransactionRepository } from 'src/database/repositories/movie-transaction';
 
 @Module({
-  imports: [DatabaseModule.forFeature(), UserModule],
-  controllers: [
-    AdminMovieController,
-    UserMovieController,
-    MovieTransactionController,
+  imports: [DatabaseModule.forFeature(), UserModule, WalletModule],
+  controllers: [AdminMovieController, UserMovieController],
+  providers: [
+    MovieService,
+    MovieRepository,
+    MovieTransactionManagementService,
+    MovieTransactionRepository,
   ],
-  providers: [MovieService, MovieRepository, MovieTransactionService],
 })
 export class MovieModule {}

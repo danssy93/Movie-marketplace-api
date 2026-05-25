@@ -1,7 +1,7 @@
 import {
   Body,
   Controller,
-  Get,
+  HttpStatus,
   Logger,
   Param,
   ParseIntPipe,
@@ -20,16 +20,16 @@ import type { Response } from 'express';
 import { AdminJwtGuard } from 'src/modules/admin-auth/guards/admin-jwt.guard';
 import { Roles } from 'src/common/decorators/role.decorator';
 import { RolesGuard } from 'src/common/guards/role.guard';
-import { AdministratorType, Role } from 'src/database/enums';
+import { AdministratorType } from 'src/database/enums';
 
 @UseGuards(AdminJwtGuard, RolesGuard)
 @Roles(AdministratorType.ADMIN)
-@Controller('upload')
+@Controller('movies')
 export class AdminMovieController {
   private readonly logger = new Logger(AdminMovieController.name);
   constructor(private readonly movieService: MovieService) {}
 
-  @Post('admin')
+  @Post('upload/admin')
   async createMovie(
     @Body() payload: CreateMovieDto,
     @Res() res: Response,

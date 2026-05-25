@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  HttpStatus,
   Logger,
   Post,
   Res,
@@ -17,15 +18,17 @@ import { CustomerJwtGuard } from 'src/modules/user-auth/guards/user-jwt.guard';
 import { CreateMovieDto } from '../../dtos/createMovie.dto';
 import { MovieService } from '../../services/movie/movie.service';
 import type { Response } from 'express';
+import { TransactionStatus } from 'src/modules/wallet/enum/wallet.enum';
+import { PurchaseMovieDto } from '../../dtos/purchase.dto';
 
-@Controller('upload')
+@Controller('movies')
 export class UserMovieController {
   private readonly logger = new Logger(UserMovieController.name);
   constructor(private readonly movieService: MovieService) {}
 
   @UseGuards(CustomerJwtGuard, RolesGuard)
   @Roles(Role.AUTHOR)
-  @Post('author')
+  @Post('upload/author')
   async createMovie(
     @Body() payload: CreateMovieDto,
     @Res() res: Response,
@@ -39,5 +42,34 @@ export class UserMovieController {
   async getMovies(@Res() res: Response) {
     const movies = await this.movieService.getMovies();
     return ResponseFormat.success(res, 'Movies retrieved successfully', movies);
+  }
+
+  @UseGuards(CustomerJwtGuard, RolesGuard)
+  @Roles(Role.AUTHOR)
+  @Post('purchase')
+  async purchase(
+    @Body() purchaseMovieDto: PurchaseMovieDto,
+    @Res() res: Response,
+    @CurrentUser() user: User,
+  ) {
+    const { message, status, payload } = await this.movieService.purchaseMovie(
+      purchaseMovieDto,
+      user,
+    );
+
+    if (status == TransactionStatus.SUCCESSFUL) {
+      return ResponseFormat.success(res, message, payload);
+    }
+
+    if (status == TransactionStatus.IN_PROGRESS) {
+      return ResponseFormat.success(res, message, payload);
+    }
+
+    return ResponseFormat.success(
+      res,
+      message,
+      payload,
+      HttpStatus.EXPECTATION_FAILED,
+    );
   }
 }
