@@ -45,7 +45,9 @@ export class WalletController {
     @Res() res: Response,
     @CurrentUser() user: User,
   ) {
-    const query = { user_id: user.id };
+    console.log('🔍 user.id =', user.id, typeof user.id); // 👈 add this
+    console.log('🔍 query =', { user_id: user.id });
+    const query = { user: { id: user.id } };
     await this.walletService.creditWallet(query, {
       user_id: user.id,
       amount: payload.amount,

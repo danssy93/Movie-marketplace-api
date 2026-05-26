@@ -203,7 +203,7 @@ export class MovieService {
         { id: platformWallet.id },
         {
           amount: platformShare,
-          user_id: platformWallet.user_id ?? '',
+          user_id: String(platformWallet.user?.id ?? ''),
           transaction_id: transactionId,
           transaction_type: TransactionType.CREDIT,
         },

@@ -18,5 +18,6 @@ import { MovieTransactionRepository } from 'src/database/repositories/movie-tran
     MovieTransactionManagementService,
     MovieTransactionRepository,
   ],
+  exports: [MovieTransactionRepository],
 })
 export class MovieModule {}

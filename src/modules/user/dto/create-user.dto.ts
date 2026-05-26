@@ -8,6 +8,7 @@ import {
   IsArray,
   IsEnum,
   ArrayNotEmpty,
+  IsPhoneNumber,
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { Role } from 'src/database/enums';
@@ -33,6 +34,17 @@ export class CreateUserDto {
   @IsNotEmpty({ message: 'Email is required.' })
   @Matches(/^[^\s]+$/, { message: 'Email cannot contain whitespace.' })
   email: string;
+
+  @ApiProperty({
+    example: '+2348012345678',
+    title: 'Phone',
+    required: true,
+  })
+  @IsPhoneNumber()
+  @IsString({ message: 'Email must be a string' })
+  @IsNotEmpty({ message: 'Email is required.' })
+  @Matches(/^[^\s]+$/, { message: 'Email cannot contain whitespace.' })
+  phone: string;
 
   @ApiProperty({
     example: '123456',

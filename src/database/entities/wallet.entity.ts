@@ -6,9 +6,6 @@ import { WalletType } from 'src/modules/wallet/enum/wallet.enum';
 
 @Entity('wallet')
 export class Wallet extends AbstractEntity {
-  @Column({ nullable: true })
-  user_id: string;
-
   @Column({ type: 'decimal', precision: 10, scale: 2, default: 0.0 })
   balance: number;
 

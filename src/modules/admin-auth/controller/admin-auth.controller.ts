@@ -26,6 +26,7 @@ import { User } from 'src/database/entities/user.entity';
 import { AdminJwtGuard } from '../guards/admin-jwt.guard';
 import { AdminRefreshAuthGuard } from '../guards/admin-refresh-auth.guard';
 import AppError from 'src/common/error/AppError';
+import { RolesGuard } from 'src/common/guards/role.guard';
 
 @Controller('auth/admin')
 export class AdminAuthController {
@@ -97,7 +98,7 @@ export class AdminAuthController {
   @ApiBadRequestResponse({
     description: 'Validation failed or required parameters missing.',
   })
-  @ApiBearerAuth('admin-jwt')
+  @ApiBearerAuth('AdminJWT')
   @UseGuards(AdminJwtGuard)
   @Post('logout')
   async logout(@Res() res: Response, @CurrentUser() user: User) {

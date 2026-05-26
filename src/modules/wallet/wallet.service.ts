@@ -30,10 +30,14 @@ export class WalletService {
     await queryRunner.startTransaction();
 
     try {
+      console.log('🔍 queryObject =', queryObject); // 👈 add this
+
       const wallet = await queryRunner.manager.findOne(Wallet, {
         where: queryObject,
         lock: { mode: 'pessimistic_write' },
       });
+
+      console.log('🔍 wallet found =', wallet);
 
       if (!wallet) {
         throw new AppError('Wallet not found', HttpStatus.NOT_FOUND);
@@ -55,7 +59,7 @@ export class WalletService {
       await this.ledgerService.create(
         {
           amount: +payload.amount,
-          user_id: wallet.user_id,
+          user_id: payload.user_id,
           balance_after: balanceAfter,
           type: payload.transaction_type,
           balance_before: wallet.balance,
@@ -140,7 +144,7 @@ export class WalletService {
 
       await this.ledgerService.create(
         {
-          user_id: wallet.user_id,
+          user_id: String(wallet.user?.id ?? ''),
           amount: +payload.amount,
           balance_after: balanceAfter,
           balance_before: wallet.balance,
