@@ -33,9 +33,8 @@ export class MovieService {
   async createMovie(
     payload: CreateMovieDto,
     uploader: User | Admin,
+    isAuthor: boolean,
   ): Promise<IMovieResponse> {
-    const isAuthor = uploader instanceof User;
-
     const existingMovie = await this.movieRepository.findOne({
       title: payload.title,
     });
@@ -67,7 +66,7 @@ export class MovieService {
 
     const updated = await this.movieRepository.update(
       { id: movieId },
-      { status },
+      { status, admin: admin },
     );
     return this.formatResponse(updated);
   }
@@ -101,9 +100,12 @@ export class MovieService {
     const { id: userId } = user;
 
     // 1. Find the movie
-    const movie = await this.movieRepository.findOne({
-      id: String(payload.movie_id),
-    });
+    const movie = await this.movieRepository.findOne(
+      {
+        id: String(payload.movie_id),
+      },
+      { relations: ['author', 'admin'] },
+    );
 
     if (!movie) {
       throw new AppError('Movie not found', HttpStatus.NOT_FOUND);
@@ -133,7 +135,7 @@ export class MovieService {
 
     // 4. Find customer wallet
     const customerWallet = await this.walletService.findOne(
-      { user_id: userId },
+      { user: { id: userId } },
       true,
     );
 
@@ -156,6 +158,10 @@ export class MovieService {
       ? Number((amount * 0.3).toFixed(2)) // 30% to platform
       : amount; // 100% to platform if admin uploaded
 
+    console.log('🔍 movie.author =', movie.author);
+    console.log('🔍 isAuthorMovie =', isAuthorMovie);
+    console.log('🔍 authorShare =', authorShare);
+    console.log('🔍 platformShare =', platformShare);
     // 7. Generate transaction ID
     const transactionId = Helpers.generateReference();
 
@@ -167,7 +173,7 @@ export class MovieService {
     try {
       // 9. Debit customer wallet
       await this.walletService.debitWallet(
-        { user_id: userId },
+        { user: { id: userId } },
         {
           amount,
           user_id: userId,
@@ -179,7 +185,7 @@ export class MovieService {
       // 10. Credit author wallet (only if author uploaded)
       if (isAuthorMovie && movie.author) {
         await this.walletService.creditWallet(
-          { user_id: movie.author.id },
+          { user: { id: movie.author.id } },
           {
             amount: authorShare,
             user_id: movie.author.id,

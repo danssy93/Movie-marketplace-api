@@ -20,12 +20,14 @@ import { MovieService } from '../../services/movie/movie.service';
 import type { Response } from 'express';
 import { TransactionStatus } from 'src/modules/wallet/enum/wallet.enum';
 import { PurchaseMovieDto } from '../../dtos/purchase.dto';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
 @Controller('movies')
 export class UserMovieController {
   private readonly logger = new Logger(UserMovieController.name);
   constructor(private readonly movieService: MovieService) {}
 
+  @ApiBearerAuth('CustomerJWT')
   @UseGuards(CustomerJwtGuard, RolesGuard)
   @Roles(Role.AUTHOR)
   @Post('upload/author')
@@ -34,7 +36,7 @@ export class UserMovieController {
     @Res() res: Response,
     @CurrentUser() user: User,
   ) {
-    const movie = await this.movieService.createMovie(payload, user);
+    const movie = await this.movieService.createMovie(payload, user, true);
     return ResponseFormat.success(res, 'Movie created successfully', movie);
   }
 
@@ -44,8 +46,9 @@ export class UserMovieController {
     return ResponseFormat.success(res, 'Movies retrieved successfully', movies);
   }
 
+  @ApiBearerAuth('CustomerJWT')
   @UseGuards(CustomerJwtGuard, RolesGuard)
-  @Roles(Role.AUTHOR)
+  @Roles(Role.CUSTOMER)
   @Post('purchase')
   async purchase(
     @Body() purchaseMovieDto: PurchaseMovieDto,

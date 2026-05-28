@@ -28,3 +28,9 @@ export class LoginDto {
   @IsPhoneNumber('NG', { message: 'Invalid  Phone number format' })
   readonly identifier: string;
 }
+
+// export class RefreshTokenDto {
+//   @IsString()
+//   @IsNotEmpty()
+//   refreshToken: string;
+// }

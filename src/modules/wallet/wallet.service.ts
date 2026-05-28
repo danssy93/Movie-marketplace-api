@@ -59,11 +59,13 @@ export class WalletService {
       await this.ledgerService.create(
         {
           amount: +payload.amount,
-          user_id: payload.user_id,
+          user: { id: payload.user_id } as any,
+          wallet: wallet,
           balance_after: balanceAfter,
           type: payload.transaction_type,
           balance_before: wallet.balance,
           transaction_id: payload.transaction_id,
+          status: 'successful',
         },
         queryRunner,
       );
@@ -144,12 +146,14 @@ export class WalletService {
 
       await this.ledgerService.create(
         {
-          user_id: String(wallet.user?.id ?? ''),
+          user: { id: payload.user_id } as any,
           amount: +payload.amount,
+          wallet: wallet,
           balance_after: balanceAfter,
           balance_before: wallet.balance,
           type: TransactionType.DEBIT,
           transaction_id: payload.transaction_id,
+          status: 'successful',
         },
         queryRunner,
       );

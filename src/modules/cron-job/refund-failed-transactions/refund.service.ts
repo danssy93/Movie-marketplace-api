@@ -57,10 +57,10 @@ export class RefundFailedTransactionsService {
 
             continue;
           }
-
+          await this.processRefund(transaction);
           await this.markTransactionResolved(transaction);
 
-          await this.processRefund(transaction);
+          await new Promise((resolve) => setTimeout(resolve, 2000));
 
           totalSuccess++;
         } catch (error) {
@@ -82,9 +82,9 @@ export class RefundFailedTransactionsService {
 
   private async processRefund(transaction: MovieTransaction) {
     await this.walletService.creditWallet(
-      { user_id: transaction.customer.id },
+      { user: { id: transaction.customer.id } },
       {
-        user_id: transaction.customer.id,
+        user_id: String(transaction.customer.id),
         amount: transaction.amount,
         transaction_type: TransactionType.CREDIT,
         transaction_id: transaction.transaction_id,

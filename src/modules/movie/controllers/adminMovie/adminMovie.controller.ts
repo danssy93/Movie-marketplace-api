@@ -21,7 +21,9 @@ import { AdminJwtGuard } from 'src/modules/admin-auth/guards/admin-jwt.guard';
 import { Roles } from 'src/common/decorators/role.decorator';
 import { RolesGuard } from 'src/common/guards/role.guard';
 import { AdministratorType } from 'src/database/enums';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
+@ApiBearerAuth('AdminJWT')
 @UseGuards(AdminJwtGuard, RolesGuard)
 @Roles(AdministratorType.ADMIN)
 @Controller('movies')
@@ -35,7 +37,7 @@ export class AdminMovieController {
     @Res() res: Response,
     @CurrentUser() user: User,
   ) {
-    const movie = await this.movieService.createMovie(payload, user);
+    const movie = await this.movieService.createMovie(payload, user, false);
     return ResponseFormat.success(res, 'Movie created successfully', movie);
   }
 

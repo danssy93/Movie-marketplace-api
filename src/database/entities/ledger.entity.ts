@@ -19,9 +19,6 @@ export enum PaymentType {
 
 @Entity()
 export class Ledger extends AbstractEntity {
-  @Column({ nullable: true })
-  user_id: string;
-
   @Column('decimal', { precision: 10, scale: 2 })
   amount: number;
 

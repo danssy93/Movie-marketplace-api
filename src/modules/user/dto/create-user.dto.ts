@@ -9,6 +9,7 @@ import {
   IsEnum,
   ArrayNotEmpty,
   IsPhoneNumber,
+  IsOptional,
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { Role } from 'src/database/enums';
@@ -64,4 +65,8 @@ export class CreateUserDto {
   roles: Role[];
 }
 
-export class UpdateUserDto extends PartialType(CreateUserDto) {}
+export class UpdateUserDto extends PartialType(CreateUserDto) {
+  @IsOptional()
+  @IsString()
+  refreshToken?: string | null;
+}
