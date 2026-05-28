@@ -11,10 +11,11 @@ export class LedgerService {
     payload: Partial<Ledger>,
     queryRunner?: QueryRunner,
   ): Promise<Ledger> {
-    const ledger = await this.ledgerRepository.create(payload);
-    return queryRunner
-      ? await queryRunner.manager.save(ledger)
-      : await this.ledgerRepository.save(ledger);
+    if (queryRunner) {
+      const ledger = queryRunner.manager.create(Ledger, payload);
+      return await queryRunner.manager.save(ledger);
+    }
+    return await this.ledgerRepository.create(payload);
   }
 
   async findOne(query: FindOptionsWhere<Ledger>): Promise<Ledger | null> {

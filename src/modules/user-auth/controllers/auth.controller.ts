@@ -67,7 +67,7 @@ export class UserAuthController {
   @ApiNotFoundResponse({
     description: 'User record not found',
   })
-  @ApiBearerAuth('customer-refresh-jwt')
+  @ApiBearerAuth('RefreshJWT')
   @UseGuards(CustomerRefreshAuthGuard)
   @Post('refresh_token')
   async refreshToken(@Res() res: Response, @CurrentUser() user: User) {

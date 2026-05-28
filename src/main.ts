@@ -48,28 +48,6 @@ async function bootstrap() {
       },
       'CustomerJWT',
     )
-    .addBearerAuth(
-      {
-        type: 'http',
-        scheme: 'bearer',
-        bearerFormat: 'JWT',
-        name: 'admin-refresh-jwt',
-        in: 'header',
-        description: 'Enter Admin refresh token',
-      },
-      'admin-refresh-jwt',
-    )
-    .addBearerAuth(
-      {
-        type: 'http',
-        scheme: 'bearer',
-        bearerFormat: 'JWT',
-        name: 'customer-refresh-jwt',
-        in: 'header',
-        description: 'Enter Customer refresh token',
-      },
-      'customer-refresh-jwt',
-    )
     .build();
 
   const document = SwaggerModule.createDocument(app, swaggerConfig);

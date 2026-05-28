@@ -43,6 +43,8 @@ export class WalletService {
         throw new AppError('Wallet not found', HttpStatus.NOT_FOUND);
       }
 
+      console.log('🔍 updating balance...');
+
       await queryRunner.manager
         .createQueryBuilder()
         .update(Wallet)
@@ -50,6 +52,8 @@ export class WalletService {
         .where('id = :id', { id: wallet.id })
         .setParameters({ amount: payload.amount })
         .execute();
+
+      console.log('🔍 balance updated, creating ledger...');
 
       const balanceAfter = Helpers.sumAmountFormatter(
         wallet.balance,
@@ -59,7 +63,10 @@ export class WalletService {
       await this.ledgerService.create(
         {
           amount: +payload.amount,
-          user: { id: payload.user_id } as any,
+          user:
+            payload.user_id && payload.user_id !== '0'
+              ? ({ id: payload.user_id } as any)
+              : undefined,
           wallet: wallet,
           balance_after: balanceAfter,
           type: payload.transaction_type,
@@ -70,7 +77,11 @@ export class WalletService {
         queryRunner,
       );
 
+      console.log('🔍 ledger created, committing...');
+
       await queryRunner.commitTransaction();
+
+      console.log('🔍 committed!');
 
       return {
         amount: +payload.amount,

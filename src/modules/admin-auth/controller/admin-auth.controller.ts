@@ -68,7 +68,7 @@ export class AdminAuthController {
   @ApiNotFoundResponse({
     description: 'User record not found',
   })
-  @ApiBearerAuth('admin-refresh-jwt')
+  @ApiBearerAuth('RefreshJWT')
   @UseGuards(AdminRefreshAuthGuard)
   @Post('refresh-token')
   async refreshToken(@Res() res: Response, @CurrentUser() user: User) {
