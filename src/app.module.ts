@@ -10,6 +10,7 @@ import { WalletModule } from './modules/wallet/wallet.module';
 import { MovieModule } from './modules/movie/movie.module';
 import { LedgerModule } from './modules/ledger/ledger.module';
 import { CronJobModule } from './modules/cron-job/cron-job.module';
+import { DashboardModule } from './modules/dashboard/dashboard.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { CronJobModule } from './modules/cron-job/cron-job.module';
     MovieModule,
     LedgerModule,
     CronJobModule,
+    DashboardModule,
   ],
   controllers: [],
   providers: [],
