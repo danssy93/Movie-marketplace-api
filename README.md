@@ -19,6 +19,7 @@ A comprehensive movie marketplace REST API built with NestJS, TypeORM, and MySQL
 - [Wallet System](#wallet-system)
 - [Movie Purchase Flow](#movie-purchase-flow)
 - [Background Workers](#background-workers)
+- [Dashboard](#dashboard)
 
 ---
 
@@ -68,6 +69,7 @@ src/
     ├── wallet/           # Wallet operations
     ├── ledger/           # Transaction ledger
     ├── movie/            # Movie management & purchases
+    ├── dashboard/        # Admin, author & customer dashboards
     └── cron-job/         # Background workers
 ```
 
@@ -136,6 +138,11 @@ npx ts-node src/database/seeder/seed-up.ts seed-up
 ```
 
 ### Default Superadmin Credentials
+
+```
+Email: tobi@marketplace.com
+Password: SUPERADMIN123
+```
 
 ### Wipe Database
 
@@ -219,6 +226,118 @@ The API uses two separate JWT auth schemes:
 | GET    | `/movies`          | Get all published movies | Public      |
 | PATCH  | `/status/:movieId` | Update movie status      | AdminJWT    | ADMIN    |
 | POST   | `/purchase`        | Purchase a movie         | CustomerJWT | CUSTOMER |
+
+### Dashboard (`/api/dashboard`)
+
+| Method | Endpoint    | Description              | Auth        | Role              |
+| ------ | ----------- | ------------------------ | ----------- | ----------------- |
+| GET    | `/admin`    | Admin dashboard stats    | AdminJWT    | ADMIN, SUPERADMIN |
+| GET    | `/author`   | Author dashboard stats   | CustomerJWT | AUTHOR            |
+| GET    | `/customer` | Customer dashboard stats | CustomerJWT | CUSTOMER          |
+
+All dashboard endpoints support date range filtering via query params:
+
+| Param        | Type   | Required | Example      |
+| ------------ | ------ | -------- | ------------ |
+| `start_date` | string | No       | `2026-01-01` |
+| `end_date`   | string | No       | `2026-12-31` |
+| `page`       | number | No       | `1`          |
+| `limit`      | number | No       | `10`         |
+
+#### Admin Dashboard Response
+
+```json
+{
+  "users": {
+    "total": 10,
+    "total_customers": 7,
+    "total_authors": 3,
+    "new_this_period": 2
+  },
+  "movies": {
+    "total": 15,
+    "published": 10,
+    "draft": 5,
+    "top_selling": [
+      {
+        "id": 1,
+        "title": "The Dark Knight",
+        "total_purchases": 25,
+        "total_revenue": 50000
+      }
+    ]
+  },
+  "revenue": {
+    "platform_balance": 15000,
+    "total_revenue": 50000,
+    "revenue_this_period": 10000
+  },
+  "transactions": {
+    "total": 50,
+    "successful": 45,
+    "failed": 3,
+    "refunded": 2,
+    "recent": []
+  }
+}
+```
+
+#### Author Dashboard Response
+
+```json
+{
+  "movies": {
+    "total": 5,
+    "published": 3,
+    "draft": 2,
+    "list": [
+      {
+        "id": 1,
+        "title": "My Movie",
+        "status": "published",
+        "price": 2000,
+        "total_purchases": 10,
+        "total_revenue": 14000
+      }
+    ]
+  },
+  "earnings": {
+    "wallet_balance": 14000,
+    "total_earned": 14000,
+    "earned_this_period": 7000
+  },
+  "transactions": {
+    "total": 10,
+    "recent": []
+  }
+}
+```
+
+#### Customer Dashboard Response
+
+```json
+{
+  "wallet": {
+    "balance": 8000
+  },
+  "purchases": {
+    "total": 3,
+    "recent": [
+      {
+        "id": 1,
+        "title": "The Dark Knight",
+        "genre": "action",
+        "price": 2000,
+        "purchased_at": "2026-05-28T12:00:00.000Z"
+      }
+    ]
+  },
+  "transactions": {
+    "total": 5,
+    "recent": []
+  }
+}
+```
 
 ---
 
@@ -390,6 +509,35 @@ Finds all stuck IN_PROGRESS transactions and retries them.
 
 ---
 
+## Dashboard
+
+The dashboard module provides analytics and stats for each user role.
+
+### Admin Dashboard (`GET /api/dashboard/admin`)
+
+- Total users breakdown (customers vs authors)
+- New users in selected period
+- Total movies (published vs draft)
+- Top 5 selling movies with revenue
+- Platform wallet balance and total revenue
+- Transaction stats (successful, failed, refunded)
+- 10 most recent transactions
+
+### Author Dashboard (`GET /api/dashboard/author`)
+
+- Author's movies list with purchase stats per movie
+- Total earnings and period earnings
+- Wallet balance
+- Recent transactions on their movies
+
+### Customer Dashboard (`GET /api/dashboard/customer`)
+
+- Wallet balance
+- Purchased movies list
+- Transaction history filtered by date range
+
+---
+
 ## Entities
 
 | Entity             | Description                               |
@@ -428,4 +576,4 @@ Common status codes:
 
 ## License
 
-MIT
+Daudu Tobi
