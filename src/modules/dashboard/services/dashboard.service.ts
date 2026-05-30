@@ -48,13 +48,13 @@ export class DashboardService {
 
     const totalAuthors = await this.dataSource
       .getRepository('users')
-      .createQueryBuilder('users')
-      .where('user.roles LIKE :author', { role: '%author%' })
+      .createQueryBuilder('user')
+      .where('user.roles LIKE :role', { role: '%author%' })
       .getCount();
 
     const newUsersPeriod = await this.dataSource
       .getRepository('users')
-      .createQueryBuilder('users')
+      .createQueryBuilder('user')
       .where('user.created_at BETWEEN :start AND :end', { start, end })
       .getCount();
 
@@ -78,14 +78,14 @@ export class DashboardService {
     const topSelling = await this.dataSource
       .getRepository('movie_transaction')
       .createQueryBuilder('mt')
-      .select('mt.movieId', 'movie_id')
-      .addSelect('COUNT(mt.id', 'total_purchases')
+      .select('mt.movie_id', 'movie_id')
+      .addSelect('COUNT(mt.id)', 'total_purchases')
       .addSelect('SUM(mt.amount)', 'total_revenue')
       .addSelect('m.title', 'title')
-      .innerJoin('movies', 'm', 'm.id = mt.movieId')
+      .innerJoin('movies', 'm', 'm.id = mt.movie_id')
       .where('mt.status = :status', { status: TransactionStatus.SUCCESSFUL })
       .andWhere('mt.created_at BETWEEN :start AND :end', { start, end })
-      .groupBy('mt.movieId')
+      .groupBy('mt.movie_id')
       .addGroupBy('m.title')
       .orderBy('total_Purchases', 'DESC')
       .limit(5)
@@ -141,7 +141,7 @@ export class DashboardService {
     const recentTransactions = await this.dataSource
       .getRepository('movie_transaction')
       .createQueryBuilder('mt')
-      .leftJoin('movies', 'm', 'm.id = mt.movieId')
+      .leftJoin('movies', 'm', 'm.id = mt.movie_id')
       .select([
         'mt.id as id',
         'mt.amount as amount',
@@ -202,20 +202,20 @@ export class DashboardService {
     const totalMovies = await this.dataSource
       .getRepository('movies')
       .createQueryBuilder('movie')
-      .where('movie.authorId = :authorId', { authorId })
+      .where('movie.author_id = :authorId', { authorId })
       .getCount();
 
     const publishedMovies = await this.dataSource
       .getRepository('movies')
       .createQueryBuilder('movie')
-      .where('movie.authorId = :authorId', { authorId })
+      .where('movie.author_id = :authorId', { authorId })
       .andWhere('movie.status = :status', { status: MovieStatus.PUBLISHED })
       .getCount();
 
     const draftMovies = await this.dataSource
       .getRepository('movies')
       .createQueryBuilder('movie')
-      .where('movie.authorId = :authorId', { authorId })
+      .where('movie.author_id = :authorId', { authorId })
       .andWhere('movie.status = :status', { status: MovieStatus.DRAFT })
       .getCount();
 
@@ -226,7 +226,7 @@ export class DashboardService {
       .leftJoin(
         'movie_transaction',
         'mt',
-        'mt.movieId = movie.id AND mt.status = :status',
+        'mt.movie_id = movie.id AND mt.status = :status',
         { status: TransactionStatus.SUCCESSFUL },
       )
       .select([
@@ -237,7 +237,7 @@ export class DashboardService {
         'COUNT(mt.id) as total_purchases',
         'SUM(mt.author_share) as total_revenue',
       ])
-      .where('movie.authorId = :authorId', { authorId })
+      .where('movie.author_id = :authorId', { authorId })
       .groupBy('movie.id')
       .getRawMany();
 
@@ -254,8 +254,8 @@ export class DashboardService {
       .getRepository('movie_transaction')
       .createQueryBuilder('mt')
       .select('SUM(mt.author_share)', 'total')
-      .innerJoin('movies', 'm', 'm.id = mt.movieId')
-      .where('m.authorId = :authorId', { authorId })
+      .innerJoin('movies', 'm', 'm.id = mt.movie_id')
+      .where('m.author_id = :authorId', { authorId })
       .andWhere('mt.status = :status', { status: TransactionStatus.SUCCESSFUL })
       .getRawOne();
 
@@ -264,8 +264,8 @@ export class DashboardService {
       .getRepository('movie_transaction')
       .createQueryBuilder('mt')
       .select('SUM(mt.author_share)', 'total')
-      .innerJoin('movies', 'm', 'm.id = mt.movieId')
-      .where('m.authorId = :authorId', { authorId })
+      .innerJoin('movies', 'm', 'm.id = mt.movie_id')
+      .where('m.author_id = :authorId', { authorId })
       .andWhere('mt.status = :status', { status: TransactionStatus.SUCCESSFUL })
       .andWhere('mt.created_at BETWEEN :start AND :end', { start, end })
       .getRawOne();
@@ -274,7 +274,7 @@ export class DashboardService {
     const recentTransactions = await this.dataSource
       .getRepository('movie_transaction')
       .createQueryBuilder('mt')
-      .leftJoin('movies', 'm', 'm.id = mt.movieId')
+      .leftJoin('movies', 'm', 'm.id = mt.movie_id')
       .select([
         'mt.id as id',
         'mt.amount as amount',
@@ -283,7 +283,7 @@ export class DashboardService {
         'mt.customer_name as customer_name',
         'm.title as movie_title',
       ])
-      .where('m.authorId = :authorId', { authorId })
+      .where('m.author_id = :authorId', { authorId })
       .orderBy('mt.created_at', 'DESC')
       .limit(10)
       .getRawMany();
@@ -342,14 +342,14 @@ export class DashboardService {
     const totalPurchases = await this.dataSource
       .getRepository('movie_transaction')
       .createQueryBuilder('mt')
-      .where('mt.customerId = :customerId', { customerId })
+      .where('mt.customer_id = :customerId', { customerId })
       .andWhere('mt.status = :status', { status: TransactionStatus.SUCCESSFUL })
       .getCount();
 
     const recentPurchases = await this.dataSource
       .getRepository('movie_transaction')
       .createQueryBuilder('mt')
-      .leftJoin('movies', 'm', 'm.id = mt.movieId')
+      .leftJoin('movies', 'm', 'm.id = mt.movie_id')
       .select([
         'm.id as id',
         'm.title as title',
@@ -357,7 +357,7 @@ export class DashboardService {
         'm.price as price',
         'mt.created_at as purchased_at',
       ])
-      .where('mt.customerId = :customerId', { customerId })
+      .where('mt.customer_id = :customerId', { customerId })
       .andWhere('mt.status = :status', { status: TransactionStatus.SUCCESSFUL })
       .orderBy('mt.created_at', 'DESC')
       .limit(10)
@@ -367,7 +367,7 @@ export class DashboardService {
     const recentTransactions = await this.dataSource
       .getRepository('movie_transaction')
       .createQueryBuilder('mt')
-      .leftJoin('movies', 'm', 'm.id = mt.movieId')
+      .leftJoin('movies', 'm', 'm.id = mt.movie_id')
       .select([
         'mt.id as id',
         'mt.amount as amount',
@@ -376,7 +376,7 @@ export class DashboardService {
         'mt.customer_name as customer_name',
         'm.title as movie_title',
       ])
-      .where('mt.customerId = :customerId', { customerId })
+      .where('mt.customer_id = :customerId', { customerId })
       .andWhere('mt.created_at BETWEEN :start AND :end', { start, end })
       .orderBy('mt.created_at', 'DESC')
       .limit(10)
